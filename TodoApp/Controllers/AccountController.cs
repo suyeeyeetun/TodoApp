@@ -36,7 +36,7 @@ namespace TodoApp.Controllers
             user.PasswordHash = _passwordHasher.HashPassword(user, _dto.PasswordHash);
             _db.TblUsers.Add(user);
             await _db.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("/Tasks/Index");
         }
 
         [HttpGet]
@@ -53,7 +53,10 @@ namespace TodoApp.Controllers
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, _dto.PasswordHash);
             if(result == PasswordVerificationResult.Failed)
                 return Unauthorized();
-            return RedirectToAction("Index");
+            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetString("Username", user.Username);
+
+            return RedirectToAction("Index","Tasks");
         }
     }
 }
