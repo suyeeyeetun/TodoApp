@@ -17,10 +17,12 @@
 
                     <div class="card-body">
                         <!-- Add Todo -->
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Enter a task">
-                            <button class="btn btn-primary">Add</button>
-                        </div>
+                        <form action="/Tasks/Create" method="post">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" name="title" placeholder="Enter a task">
+                                <button class="btn btn-primary" id="addBtn">Add</button>
+                            </div>
+                        </form>
 
                         <!-- Todo Items -->
                         <ul class="list-group">
@@ -64,9 +66,7 @@
 
                     </div>
 
-                    @* <div class="card-footer text-muted text-center">
-                        Total tasks: 2
-                    </div> *@
+                    
                 </div>
 
             </div>

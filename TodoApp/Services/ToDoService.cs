@@ -25,5 +25,23 @@ public class ToDoService : IToDoService
 
         return result;
     }
+    [HttpPost]
+    public async Task CreateTask(int userId,TasksRequestDto request)
+    {
+        await _db.TblTodoItems.AddAsync(new TblTodoItem
+        {
+            Title = request.Title,
+            IsCompleted = false,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+        });
+        await _db.SaveChangesAsync();
+    }
+    //[HttpPost]
+    //public async Task UpdateTask(int TodoItemId,TasksRequestDto request)
+    //{
+
+    //}
+
 
 }
