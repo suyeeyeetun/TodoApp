@@ -28,41 +28,54 @@
                         <ul class="list-group">
                             @foreach (var todo in Model)
                             {
-                                <li class="list-group-item">
-                                    <div class="d-flex align-items-center justify-content-between">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
 
-                                        <!-- Left: checkbox + title -->
-                                        <form asp-action="Edit" method="post"
-                                              class="d-flex align-items-center gap-2 flex-grow-1">
-                                            <input type="hidden" name="id" value="@todo.Id" />
+                                    <!-- LEFT SIDE -->
+                                    <form asp-controller="Tasks"
+                                          asp-action="ToggleComplete"
+                                          asp-route-id="@todo.TodoItemId"
+                                          method="post"
+                                          class="toggle-form">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@todo.TodoItemId" />
 
-                                            <input class="form-check-input"
+                                        <div class="form-check">
+                                            <input class="form-check-input toggle-checkbox"
                                                    type="checkbox"
-                                                   name="isCompleted"
-                                                   value="true"
                                                    @(todo.IsCompleted ? "checked" : "") />
 
-                                            <input name="title"
-                                                   class="form-control form-control-sm @(todo.IsCompleted ? "text-decoration-line-through text-muted" : "")"
-                                                   value="@todo.Title" />
+                                            <label class="form-check-label @(todo.IsCompleted ? "text-decoration-line-through text-muted" : "")">
+                                                @todo.Title
+                                            </label>
+                                        </div>
 
-                                            <!-- Actions grouped -->
-                                            <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-outline-primary">
-                                                    Edit
-                                                </button>
-                                                <button formaction="/Todo/Delete"
-                                                        formmethod="post"
-                                                        class="btn btn-outline-danger">
-                                                    🗑
-                                                </button>
-                                            </div>
+                                    </form>
+
+
+                                    <!-- RIGHT SIDE -->
+                                    <div class="btn-group btn-group-sm">
+
+                                        
+
+                                        <!-- DELETE -->
+                                        <form asp-controller="Tasks"
+                                              asp-action="Delete"
+                                              asp-route-id="@todo.TodoItemId"
+                                              method="post">
+
+                                            <button type="submit"
+                                                    class="btn btn-outline-danger">
+                                                🗑
+                                            </button>
+
                                         </form>
 
                                     </div>
+
                                 </li>
                             }
                         </ul>
+
 
                     </div>
 
@@ -74,4 +87,36 @@
     </div>
 
 </body>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".toggle-checkbox").forEach(cb => {
+            cb.addEventListener("change", function () {
+
+                const form = this.closest("form");
+                const id = form.querySelector("input[name='id']").value;
+                const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+                const label = form.querySelector("label");
+
+                fetch(form.action, {
+                    method: "POST",
+                    headers: {
+                        "RequestVerificationToken": token,
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams({ id })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // toggle line-through instantly
+                        label.classList.toggle("text-decoration-line-through");
+                        label.classList.toggle("text-muted");
+                    }
+                });
+
+            });
+        });
+    </script>
+}
 

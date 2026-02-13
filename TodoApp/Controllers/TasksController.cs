@@ -25,10 +25,27 @@ public class TasksController : Controller
     public async Task<IActionResult> Create(TasksRequestDto request)
     {
         int userId = GetUserId();
-        await _todoService.CreateTask(userId,request);
+        await _todoService.CreateTask(userId, request);
         return RedirectToAction("Index");
     }
 
+    [HttpPost("Tasks/ToggleComplete/{taskId}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleComplete(int taskId)
+    {
+        int userId = GetUserId();
+        await _todoService.ToggleTask(taskId, userId);
+        //return RedirectToAction("Index");
+        return Json(new { success = true });
+    }
+
+    [HttpPost("Tasks/Delete/{taskId}")]
+    public async Task<IActionResult> Delete(int taskId)
+    {
+        int userId = GetUserId();
+        await _todoService.DeleteTask(taskId,userId);
+        return RedirectToAction("Index");
+    }
     private int GetUserId()
     {
         return HttpContext.Session.GetInt32("UserId")

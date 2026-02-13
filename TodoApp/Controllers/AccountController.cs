@@ -26,9 +26,16 @@ namespace TodoApp.Controllers
         {
             return View();
         }
+
+
         [HttpPost]
         public async Task<IActionResult> Register(UserDto _dto)
         {
+            //if (_dto.PasswordHash != ConfirmPassword)
+            //{
+            //    ModelState.AddModelError("", "Passwords do not match");
+            //    return View(_dto);
+            //}
             var user = new TblUser
             {
                 Username = _dto.Username
@@ -36,7 +43,9 @@ namespace TodoApp.Controllers
             user.PasswordHash = _passwordHasher.HashPassword(user, _dto.PasswordHash);
             _db.TblUsers.Add(user);
             await _db.SaveChangesAsync();
-            return RedirectToAction("/Tasks/Index");
+            HttpContext.Session.SetInt32("UserId", user.UserId);
+            HttpContext.Session.SetString("Username", user.Username);
+            return RedirectToAction("Index", "Tasks");
         }
 
         [HttpGet]
@@ -51,12 +60,18 @@ namespace TodoApp.Controllers
             if (user == null)
                 return Unauthorized();
             var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, _dto.PasswordHash);
-            if(result == PasswordVerificationResult.Failed)
+            if (result == PasswordVerificationResult.Failed)
                 return Unauthorized();
             HttpContext.Session.SetInt32("UserId", user.UserId);
             HttpContext.Session.SetString("Username", user.Username);
 
-            return RedirectToAction("Index","Tasks");
+            return RedirectToAction("Index", "Tasks");
+        }
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Index");
         }
     }
 }

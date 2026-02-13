@@ -21,11 +21,13 @@ public class ToDoService : IToDoService
         var result = lst.Select(x => new TasksResponseDto
         {
             Title = x.Title,
+            TodoItemId = x.TodoItemId
         }).ToList();
 
         return result;
     }
-    [HttpPost]
+
+    
     public async Task CreateTask(int userId,TasksRequestDto request)
     {
         await _db.TblTodoItems.AddAsync(new TblTodoItem
@@ -37,11 +39,28 @@ public class ToDoService : IToDoService
         });
         await _db.SaveChangesAsync();
     }
-    //[HttpPost]
-    //public async Task UpdateTask(int TodoItemId,TasksRequestDto request)
-    //{
 
-    //}
+    public async Task ToggleTask(int taskId, int userId)
+    {
+        var result = await _db.TblTodoItems.FirstOrDefaultAsync(x => x.TodoItemId == taskId && x.UserId == userId);
+        if (result is null)
+        {
+            return;
+        }
+        result.IsCompleted = !result.IsCompleted;
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task DeleteTask(int taskId, int userId)
+    {
+        var result = await _db.TblTodoItems.FirstOrDefaultAsync(x=> x.TodoItemId == taskId && x.UserId == userId);
+        if (result is null)
+        {
+            return;
+        }
+        _db.TblTodoItems.Remove(result);
+        await _db.SaveChangesAsync();
+    }
 
 
 }

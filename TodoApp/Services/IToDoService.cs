@@ -6,5 +6,7 @@ namespace TodoApp.Services
     {
         Task<List<TasksResponseDto>> GetTasks(int userId);
         Task CreateTask(int userId,TasksRequestDto request);
+        Task DeleteTask(int taskId, int userId);
+        Task ToggleTask(int taskId, int userId);
     }
 }
